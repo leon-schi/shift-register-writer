@@ -24,11 +24,9 @@ void ShiftRegisterWriter::writeBinary(Byte* binary) {
     write();
 }
 
-int ShiftRegisterWriter::setBit(int bit, int value) {
-    if (bit >= bits || bit < 0) return -1;
-    binary[bit] = (value > 0) ? 1 : 0;
-    write();
-    return 0;
+void ShiftRegisterWriter::setBit(int bit, int value) {
+    if (bit >= 0 && bit < bits)
+        binary[bit] = (value > 0) ? 1 : 0;
 }
 
 int ShiftRegisterWriter::getNumBits() {
@@ -46,16 +44,22 @@ void ShiftRegisterWriter::setInterval(int value) {
 // private methods
 
 void ShiftRegisterWriter::clock(int pin) {
-    delay(interval);
+    //delay(interval);
     digitalWrite(pin, HIGH);
-    delay(interval);
+    //delay(interval);
     digitalWrite(pin, LOW);
 }
 
 void ShiftRegisterWriter::setBinary(int value) {
-    for (int i = 0; i < bits; i++) {
-        binary[i] = value % 2;
-        value = value / 2;
+    setBinary(value, 0, bits);
+}
+
+void ShiftRegisterWriter::setBinary(int value, int offset, int length) {
+    if (offset < bits && length <= bits - offset) {
+        for (int i = offset; i < offset + length; i++) {
+            binary[i] = value % 2;
+            value = value / 2;
+        }
     }
 }
 
